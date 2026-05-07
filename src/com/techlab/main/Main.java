@@ -1,8 +1,6 @@
 package com.techlab.main;
-
 import com.techlab.productos.Producto;
 import com.techlab.productos.ProductoService;
-
 import java.util.Scanner;
 
 public class Main {
