@@ -1,6 +1,12 @@
 package com.techlab.main;
+
 import com.techlab.productos.Producto;
 import com.techlab.productos.ProductoService;
+import com.techlab.pedidos.PedidoService;
+import com.techlab.pedidos.LineaPedido;
+import com.techlab.excepciones.StockInsuficienteException;
+
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Main {
@@ -10,6 +16,7 @@ public class Main {
         Scanner scanner = new Scanner(System.in);
 
         ProductoService productoService = new ProductoService();
+        PedidoService pedidoService = new PedidoService();
 
         int opcion;
 
@@ -23,11 +30,15 @@ public class Main {
             System.out.println("3) Buscar producto");
             System.out.println("4) Actualizar producto");
             System.out.println("5) Eliminar producto");
-            System.out.println("6) Salir");
+            //System.out.println("6) Salir");
+            System.out.println("6) Crear pedido");
+            System.out.println("7) Listar pedidos");
+            System.out.println("8) Salir");
             System.out.print("Elija una opción: ");
-
             opcion = scanner.nextInt();
+            System.out.println();
             scanner.nextLine();
+
 
             switch (opcion) {
 
@@ -65,12 +76,13 @@ public class Main {
                     break;
 
                 case 3:
-
+            
                     System.out.print("Ingrese ID del producto: ");
-                    int idBuscar = scanner.nextInt();
+
+                    String datoBuscar = scanner.nextLine();
 
                     Producto encontrado =
-                            productoService.buscarPorId(idBuscar);
+                            productoService.buscarPorId(datoBuscar);
 
                     if (encontrado != null) {
 
@@ -84,9 +96,9 @@ public class Main {
                     break;
 
                 case 4:
-
+                
                     System.out.print("Ingrese ID del producto: ");
-                    int idActualizar = scanner.nextInt();
+                    String idActualizar = scanner.nextLine();
 
                     Producto productoActualizar =
                             productoService.buscarPorId(idActualizar);
@@ -115,7 +127,7 @@ public class Main {
 
                     System.out.print("Ingrese ID a eliminar: ");
 
-                    int idEliminar = scanner.nextInt();
+                    String idEliminar = scanner.nextLine();
 
                     productoService.eliminarProducto(idEliminar);
 
@@ -123,16 +135,65 @@ public class Main {
 
                 case 6:
 
-                    System.out.println("Saliendo del sistema...");
+                        
+                    ArrayList<LineaPedido> lineas =
+                            new ArrayList<>();
+
+                    String continuar;
+
+                    do {
+                    
+                        System.out.print("Ingrese ID producto: "); // ... obtener datos del producto ...
+                        String idProducto = scanner.nextLine();
+
+                        Producto producto =
+                                productoService.buscarPorId(idProducto);
+
+                        if (producto == null) {
+
+                            System.out.println("Producto no encontrado.");
+                            break;
+                        }
+
+                        System.out.print("Cantidad: ");
+                        int cantidad = scanner.nextInt();
+
+                        LineaPedido linea =
+                                new LineaPedido(producto, cantidad);
+
+                                lineas.add(linea);
+                                
+                        scanner.nextLine();
+
+                        System.out.print("¿Agregar otro producto? (s/n): ");
+                        continuar = scanner.nextLine(); // usuario escribe "s" o "n"
+
+                    } while (continuar.equalsIgnoreCase("s")); // si escribió "s", se repite
+                    
+                    try {
+                        
+                        pedidoService.crearPedido(lineas);
+                        
+                    } catch (StockInsuficienteException e) {
+
+                        System.out.println(e.getMessage());
+                    }
+
                     break;
 
-                default:
+                 case 7:
+
+                    pedidoService.listarPedidos();
+                    
+                    break;
+                    
+                 default:
 
                     System.out.println("Opción inválida.");
-            }
+                }
+                
+    } while (opcion != 8);
 
-        } while (opcion != 6);
-
-        scanner.close();
-    }
+    scanner.close();
+    };
 }

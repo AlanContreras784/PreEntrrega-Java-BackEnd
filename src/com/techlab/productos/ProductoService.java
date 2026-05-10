@@ -21,17 +21,27 @@ public class ProductoService {
         }
     }
 
-    public Producto buscarPorId(int id){
+    public Producto buscarPorId(String dato){
 
-        for(Producto p : productos){
-            if(p.getId() == id){
-                return p;
+        try {
+            int id = Integer.parseInt(dato);
+            for(Producto p : productos){
+                if(p.getId() == id){
+                    return p;
+                }
+            }
+        } catch (NumberFormatException e) {
+            // No es un número, buscar por nombre
+            for(Producto p : productos){
+                if(p.getNombre().equalsIgnoreCase(dato)){
+                    return p;
+                }
             }
         }
 
         return null;
     }
-    public void eliminarProducto(int id){
+    public void eliminarProducto(String id){
 
         Producto producto = buscarPorId(id);
 
