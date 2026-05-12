@@ -2,8 +2,10 @@ package com.techlab.main;
 
 import com.techlab.productos.Producto;
 import com.techlab.productos.ProductoService;
+import com.techlab.util.Validador;
 import com.techlab.pedidos.PedidoService;
 import com.techlab.pedidos.LineaPedido;
+import com.techlab.excepciones.ProductoNoEncontradoException;
 import com.techlab.excepciones.StockInsuficienteException;
 
 import java.util.ArrayList;
@@ -30,14 +32,12 @@ public class Main {
             System.out.println("3) Buscar producto");
             System.out.println("4) Actualizar producto");
             System.out.println("5) Eliminar producto");
-            //System.out.println("6) Salir");
             System.out.println("6) Crear pedido");
             System.out.println("7) Listar pedidos");
             System.out.println("8) Salir");
-            System.out.print("Elija una opción: ");
-            opcion = scanner.nextInt();
-            System.out.println();
-            scanner.nextLine();
+            
+            opcion = Validador.leerEntero(scanner, "Elija una opción: ");
+            
 
 
             switch (opcion) {
@@ -46,25 +46,21 @@ public class Main {
 
                     try {
 
-                        System.out.print("Nombre del producto: ");
-                        String nombre = scanner.nextLine();
-
-                        System.out.print("Precio: ");
-                        double precio = scanner.nextDouble();
-
-                        System.out.print("Stock: ");
-                        int stock = scanner.nextInt();
-
+                        String nombre = Validador.leerTexto(scanner, "Nombre del producto: ");                 
+                        double precio = Validador.leerDouble(scanner, "Precio: ");
+                        int stock = Validador.leerEntero(scanner, "Stock: ");
+                        
                         Producto producto = new Producto(nombre, precio, stock);
-
+                        
                         productoService.agregarProducto(producto);
 
                         System.out.println("Producto agregado correctamente.");
 
-                    } catch (Exception e) {
-
-                        System.out.println("Error al ingresar datos.");
-                        scanner.nextLine();
+                    }catch (IllegalArgumentException | StockInsuficienteException e) {
+                        // IllegalArgumentException es la que lanza el
+                        // Validador para datos genéricos inválidos
+                        // (nombre vacío, precio negativo, etc.).
+                        System.out.println("Dato inválido: " + e.getMessage());
                     }
 
                     break;
@@ -76,92 +72,105 @@ public class Main {
                     break;
 
                 case 3:
-            
-                    System.out.print("Ingrese ID del producto: ");
-
-                    String datoBuscar = scanner.nextLine();
-
-                    Producto encontrado =
-                            productoService.buscarPorId(datoBuscar);
-
-                    if (encontrado != null) {
-
-                        System.out.println(encontrado);
-
-                    } else {
-
-                        System.out.println("Producto no encontrado.");
-                    }
+                    try{
+    
+                        String datoBuscar = Validador.leerTexto(scanner, "Ingrese ID o nombre del producto: ");
+    
+                        Producto encontrado = productoService.buscarPorIdNombre(datoBuscar);
+    
+                        if (encontrado != null) {
+                            System.out.println(encontrado);
+                        } 
+                         
+                    } catch(ProductoNoEncontradoException e) {
+                        System.out.println(e.getMessage());
+                    }   
 
                     break;
 
                 case 4:
-                
-                    System.out.print("Ingrese ID del producto: ");
-                    String idActualizar = scanner.nextLine();
 
-                    Producto productoActualizar =
-                            productoService.buscarPorId(idActualizar);
+                    try{
 
-                    if (productoActualizar != null) {
+                        String productoBuscar = Validador.leerTexto(scanner, "Ingrese ID o nombre del producto: ");
 
-                        System.out.print("Nuevo precio: ");
-                        double nuevoPrecio = scanner.nextDouble();
+                        Producto productoActual = productoService.buscarPorIdNombre(productoBuscar);
 
-                        System.out.print("Nuevo stock: ");
-                        int nuevoStock = scanner.nextInt();
+                        if (productoActual != null) {
 
-                        productoActualizar.setPrecio(nuevoPrecio);
-                        productoActualizar.setStock(nuevoStock);
+                            System.out.println("Producto encontrado: " + productoActual);
 
-                        System.out.println("Producto actualizado.");
+                            double nuevoPrecio = Validador.leerDouble(scanner, "Nuevo precio: ");
+                            int nuevoStock = Validador.leerEntero(scanner, "Nuevo stock: ");
 
-                    } else {
+                            Producto datosActualizados = new Producto (productoActual.getNombre(),nuevoPrecio, nuevoStock);
+                            Producto actualizado = productoService.actualizar(productoBuscar, datosActualizados);
+                            System.out.println("Producto actualizado." + actualizado);
 
-                        System.out.println("Producto no encontrado.");
+                        } 
+                    }catch(ProductoNoEncontradoException | StockInsuficienteException e) {
+                        System.out.println(e.getMessage());
+
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("Dato inválido: " + e.getMessage());
                     }
 
                     break;
 
                 case 5:
 
-                    System.out.print("Ingrese ID a eliminar: ");
+                    String continuarEliminar;
 
-                    String idEliminar = scanner.nextLine();
+                    do{
+                        
+                        try{
 
-                    productoService.eliminarProducto(idEliminar);
+                            String continuarConfirmar;
+
+                            String idEliminar = Validador.leerTexto(scanner, "Ingrese ID o Nombre del producto a eliminar: ");
+    
+                            continuarConfirmar = Validador.leerTexto(scanner, "¿Confirma que desea eliminar el producto " +idEliminar.toString() +" ?(s/n): ");
+                            if(continuarConfirmar.equalsIgnoreCase("s")){
+                                productoService.eliminarProducto(idEliminar);
+                            }   
+                        } catch (ProductoNoEncontradoException e) {
+                            System.out.println(e.getMessage());
+                        }
+                        continuarEliminar = Validador.leerTexto(scanner, "¿Desea eliminar otro producto? (s/n): ");
+                        
+                    } while (continuarEliminar.equalsIgnoreCase("s"));
 
                     break;
 
                 case 6:
-
                         
-                    ArrayList<LineaPedido> lineas =
-                            new ArrayList<>();
+                    ArrayList<LineaPedido> lineas = new ArrayList<>();
 
                     String continuar;
 
                     do {
-                    
-                        System.out.print("Ingrese ID producto: "); // ... obtener datos del producto ...
-                        String idProducto = scanner.nextLine();
+                        // ... obtener datos del producto ...
+                        String idProducto = Validador.leerTexto(scanner, "Ingrese ID ó Nombre del producto: ");
 
-                        Producto producto =
-                                productoService.buscarPorId(idProducto);
-
+                        Producto producto = productoService.buscarPorIdNombre(idProducto);
+                        // Verifica si el producto existe
                         if (producto == null) {
 
                             System.out.println("Producto no encontrado.");
-                            break;
+                            System.out.print("¿Desea seguir agregando productos al pedido? (s/n): ");
+
+                            continuar = scanner.nextLine();// usuario escribe "s" o "n"
+
+                            // vuelve al inicio del ciclo
+                            continue;
                         }
 
                         System.out.print("Cantidad: ");
                         int cantidad = scanner.nextInt();
 
-                        LineaPedido linea =
-                                new LineaPedido(producto, cantidad);
+                        LineaPedido linea = new LineaPedido(producto, cantidad);
 
-                                lineas.add(linea);
+                        lineas.add(linea);
                                 
                         scanner.nextLine();
 
@@ -170,6 +179,13 @@ public class Main {
 
                     } while (continuar.equalsIgnoreCase("s")); // si escribió "s", se repite
                     
+                    // Verifica que exista al menos un producto en el pedido antes de intentar crearlo
+                    if (lineas.isEmpty()) {
+
+                        System.out.println("No se creó el pedido porque no se agregaron productos.");
+                        break;
+                    }
+                    // Intenta crear el pedido con las líneas ingresadas
                     try {
                         
                         pedidoService.crearPedido(lineas);
@@ -184,6 +200,12 @@ public class Main {
                  case 7:
 
                     pedidoService.listarPedidos();
+                    
+                    break;
+
+                 case 8:
+
+                    System.out.println("Saliendo del programa...");
                     
                     break;
                     
