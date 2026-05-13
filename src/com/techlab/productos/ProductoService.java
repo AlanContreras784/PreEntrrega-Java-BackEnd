@@ -10,11 +10,18 @@ public class ProductoService {
 
     private ArrayList<Producto> productos = new ArrayList<>();
 
+    private static int contadorId = 1;
+
     public void agregarProducto(Producto producto){
+        
         Validador.validarNombre(producto.getNombre());
         Validador.validarPrecio(producto.getPrecio());
         Validador.validarStock(producto.getStock());
+        
+        producto.setId(contadorId++);
+        
         productos.add(producto);
+
     }
 
     public void listarProductos(){
