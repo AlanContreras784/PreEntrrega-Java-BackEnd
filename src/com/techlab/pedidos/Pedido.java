@@ -18,18 +18,15 @@ public class Pedido {
         lineas.add(linea);
     }
      public double calcularTotal(){
-
         double total = 0;
 
         for(LineaPedido linea : lineas){
             total += linea.calcularSubtotal();
         }
-
         return total;
     }
 
     public void mostrarPedido(){
-
         System.out.println("Pedido N° " + id);
 
             for(LineaPedido linea : lineas){
@@ -39,7 +36,6 @@ public class Pedido {
                     " | Subtotal: $" + linea.calcularSubtotal()
             );
         }
-
         System.out.println("TOTAL: $" + calcularTotal());
     }
 }

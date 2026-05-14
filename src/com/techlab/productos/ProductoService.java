@@ -3,17 +3,15 @@ package com.techlab.productos;
 import java.util.ArrayList;
 
 import com.techlab.excepciones.ProductoNoEncontradoException;
-//import com.techlab.pedidos.Pedido;
 import com.techlab.util.Validador;
 
 public class ProductoService {
 
     private ArrayList<Producto> productos = new ArrayList<>();
-
     private static int contadorId = 1;
 
     public void agregarProducto(Producto producto){
-        
+
         Validador.validarNombre(producto.getNombre());
         Validador.validarPrecio(producto.getPrecio());
         Validador.validarStock(producto.getStock());
@@ -23,7 +21,6 @@ public class ProductoService {
         productos.add(producto);
 
     }
-
     public void listarProductos(){
 
         if(productos.isEmpty()){
@@ -34,7 +31,6 @@ public class ProductoService {
             System.out.println(p);
         }
     }
-
     public Producto buscarPorIdNombre(String dato){
 
         try {
@@ -55,7 +51,6 @@ public class ProductoService {
         throw new ProductoNoEncontradoException("Producto con ID o nombre '" + dato + "' no encontrado.");
 
     }
-
     public Producto actualizar(String datoBuscar, Producto datos) {
         // Reutilizamos obtenerPorId: si no existe, lanza excepción
         // y la actualización se cancela automáticamente.
@@ -77,10 +72,6 @@ public class ProductoService {
 
         return p;
     }
-
-
-
-
     public void eliminarProducto(String id){
 
         Producto producto = buscarPorIdNombre(id);
@@ -99,6 +90,4 @@ public class ProductoService {
 
         return productos;
     }
-
-    
 } 

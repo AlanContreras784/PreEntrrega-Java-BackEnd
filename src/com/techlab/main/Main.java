@@ -23,7 +23,6 @@ public class Main {
         int opcion;
 
         do {
-
             System.out.println("\n===================================");
             System.out.println(" SISTEMA DE GESTIÓN - TECHLAB ");
             System.out.println("===================================");
@@ -38,8 +37,6 @@ public class Main {
             
             opcion = Validador.leerEntero(scanner, "Elija una opción: ");
             
-
-
             switch (opcion) {
 
                 case 1:
@@ -197,25 +194,23 @@ public class Main {
 
                     break;
 
-                 case 7:
+                case 7:
 
                     pedidoService.listarPedidos();
                     
                     break;
 
-                 case 8:
+                case 8:
 
                     System.out.println("Saliendo del programa...");
                     
                     break;
                     
-                 default:
-
+                default:
                     System.out.println("Opción inválida.");
                 }
                 
     } while (opcion != 8);
-
     scanner.close();
     };
 }
