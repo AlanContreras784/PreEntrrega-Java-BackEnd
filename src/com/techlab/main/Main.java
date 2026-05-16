@@ -115,15 +115,10 @@ public class Main {
                     break;
 
                 case 5:
-
                     String continuarEliminar;
-
                     do{
-                        
                         try{
-
                             String continuarConfirmar;
-
                             String idEliminar = Validador.leerTexto(scanner, "Ingrese ID o Nombre del producto a eliminar: ");
     
                             continuarConfirmar = Validador.leerTexto(scanner, "¿Confirma que desea eliminar el producto " +idEliminar.toString() +" ?(s/n): ");
@@ -140,37 +135,27 @@ public class Main {
                     break;
 
                 case 6:
-                        
                     ArrayList<LineaPedido> lineas = new ArrayList<>();
-
                     String continuar;
-
+                    try {
                     do {
                         // ... obtener datos del producto ...
                         String idProducto = Validador.leerTexto(scanner, "Ingrese ID ó Nombre del producto: ");
-
                         Producto producto = productoService.buscarPorIdNombre(idProducto);
                         // Verifica si el producto existe
                         if (producto == null) {
-
                             System.out.println("Producto no encontrado.");
                             System.out.print("¿Desea seguir agregando productos al pedido? (s/n): ");
 
                             continuar = scanner.nextLine();// usuario escribe "s" o "n"
-
                             // vuelve al inicio del ciclo
                             continue;
                         }
-
                         System.out.print("Cantidad: ");
                         int cantidad = scanner.nextInt();
-
                         LineaPedido linea = new LineaPedido(producto, cantidad);
-
                         lineas.add(linea);
-                                
                         scanner.nextLine();
-
                         System.out.print("¿Agregar otro producto? (s/n): ");
                         continuar = scanner.nextLine(); // usuario escribe "s" o "n"
 
@@ -178,20 +163,16 @@ public class Main {
                     
                     // Verifica que exista al menos un producto en el pedido antes de intentar crearlo
                     if (lineas.isEmpty()) {
-
                         System.out.println("No se creó el pedido porque no se agregaron productos.");
                         break;
                     }
                     // Intenta crear el pedido con las líneas ingresadas
-                    try {
-                        
                         pedidoService.crearPedido(lineas);
                         
-                    } catch (StockInsuficienteException e) {
+                    } catch (StockInsuficienteException  | ProductoNoEncontradoException e) {
 
                         System.out.println(e.getMessage());
                     }
-
                     break;
 
                 case 7:
